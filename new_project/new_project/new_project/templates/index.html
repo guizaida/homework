@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    {% block title %}
+    <title>Local Library</title>
+    {% endblock %}
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link
+      rel="stylesheet"
+      href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css"
+      integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO"
+      crossorigin="anonymous" />
+
+    <!-- Add additional CSS in static file -->
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'css/styles.css' %}" />
+  </head>
+  <body>
+    <div class="container-fluid">
+      <div class="row justify-content-center">
+        <div class="col-sm-4">
+          {% block sidebar %}
+          <div class="mb-3">
+            <label for="basic-url" class="form-label">Your vanity URL</label>
+            <div class="input-group">
+              <input type="text" class="form-control" id="url" aria-describedby="basic-addon3 basic-addon4">
+              <div class="input-group-append">
+                <button class="btn btn-primary" type="submit" id="vanity_url">Submit</button>
+              </div>
+            </div>
+          </div>
+          {% endblock %}
+        </div>
+      </div>
+    </div>
+    
+    <script>
+      // 在页面加载完成后执行 JavaScript 代码
+      document.addEventListener('DOMContentLoaded', function() {
+        // 获取按钮元素
+        var button = document.getElementById('vanity_url');
+        // 获取输入框元素
+        var input = document.getElementById('url');
+        
+        // 添加点击事件监听器
+        button.addEventListener('click', function(event) {
+          // 获取输入框的值
+          var inputValue = input.value;
+          
+          // 定义正则表达式，用于验证输入的 URL 是否符合指定格式
+          var urlPattern = /^https?:\/\/(www\.)?youtube\.com\/watch/i;
+          
+          // 如果输入框的值为空
+          if (!inputValue) {
+            // 显示提示信息
+            alert('请输入 URL！');
+          } else if (!urlPattern.test(inputValue)) { // 如果输入的 URL 不符合指定格式
+            // 显示格式错误提示信息
+            alert('请输入正确的 YouTube 视频 URL！');
+          } else {
+            // 构建包含 URL 参数的 GET 请求
+            var getRequestUrl = '/vanity_url?q=' + encodeURIComponent(inputValue);
+            
+            // 发送 GET 请求
+            fetch(getRequestUrl)
+              .then(response => {
+                // 处理响应
+                if (response.ok) {
+                  // 如果响应成功，返回 JSON 数据
+                  return response.json();
+                } else {
+                  // 如果响应失败，抛出错误
+                  throw new Error('Network response was not ok');
+                }
+              })
+              .then(data => {
+                // 处理返回的 JSON 数据
+                if (data && data.msg) {
+                  // 提取消息并将其作为参数传递给 alert 函数
+                  alert(data.msg);
+                } else {
+                  // 如果返回的数据不包含消息，则显示默认消息
+                  alert('未返回任何消息！');
+                }
+              })
+              .catch(error => {
+                // 捕获并处理任何错误
+                console.error('There was a problem with your fetch operation:', error);
+              });
+          }
+        });
+      });
+    </script>
+  </body>
+</html>
