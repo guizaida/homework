@@ -1,6 +1,5 @@
 from django.shortcuts import render
-from chat_downloader import ChatDownloader
-from chat_downloader.errors import NoChatReplay
+from yt_dlp import YoutubeDL
 from django.http import JsonResponse,HttpResponse
 
 
@@ -11,12 +10,22 @@ def index(request):
 def vanity_url(request):
     if request.method == 'GET': 
         url = request.GET.get('q', None)
-        try:
-            chat = ChatDownloader().get_chat(url,chat_type='live')
-            if chat:
-                return JsonResponse({'msg':'當前直播中'})
-            raise NoChatReplay
-        except NoChatReplay:
-            return JsonResponse({'msg':'當前輸入網址並非直播或已經結束直播'})
+        ydl_opts = {
+            'quiet': True,  # 減少輸出信息，保持輸出整潔
+            'simulate': True,  # 不實際下載視頻
+        }
+        info_msg = "影片標題:{0}\n頻道名稱:{1}\n直播狀態:{2}\n\n"
+        with YoutubeDL(ydl_opts) as ydl:
+            info_dict = ydl.extract_info(url, download=False)
+            status = info_dict.get('live_status')
+            title = info_dict.get('fulltitle')
+            channel = info_dict.get('channel')
+            if status in {"is_live", 'was_live'}:
+                if info_dict.get('is_live'):
+                    return JsonResponse({'msg':info_msg.format(title,channel,'正在進行中')})
+                else:
+                    return JsonResponse({'msg':info_msg.format(title,channel,'結束')})
+            else:
+                return JsonResponse({'msg':info_msg.format(title,channel,'並非直播')})
     else:
         return HttpResponse(status=405)
