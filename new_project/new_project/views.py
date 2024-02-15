@@ -16,16 +16,18 @@ def verify_url(request):
         }
         info_msg = "影片標題:{0}\n頻道名稱:{1}\n直播狀態:{2}\n\n"
         with YoutubeDL(ydl_opts) as ydl:
+            msg = None
             info_dict = ydl.extract_info(url, download=False)
             status = info_dict.get('live_status')
             title = info_dict.get('fulltitle')
             channel = info_dict.get('channel')
             if status in {"is_live", 'was_live'}:
                 if info_dict.get('is_live'):
-                    return JsonResponse({'msg':info_msg.format(title,channel,'正在進行中')})
+                    msg = '正在進行中'
                 else:
-                    return JsonResponse({'msg':info_msg.format(title,channel,'結束')})
+                    msg = '結束'
             else:
-                return JsonResponse({'msg':info_msg.format(title,channel,'並非直播')})
+                msg = '並非直播'
+        return JsonResponse({'msg':info_msg.format(title,channel,msg if msg else '未知錯誤')})
     else:
         return HttpResponse(status=405)
