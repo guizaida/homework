@@ -7,7 +7,7 @@ def index(request):
     return render(request, 'index.html')
 
 
-def vanity_url(request):
+def verify_url(request):
     if request.method == 'GET': 
         url = request.GET.get('q', None)
         ydl_opts = {

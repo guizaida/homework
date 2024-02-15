@@ -16,9 +16,9 @@ Including another URLconf
 """
 from django.urls import path
 
-from new_project.views import index,vanity_url
+from new_project.views import index,verify_url
 
 urlpatterns = [
-    path('vanity_url', vanity_url),
+    path('verify_url', verify_url),
     path('', index),
 ]

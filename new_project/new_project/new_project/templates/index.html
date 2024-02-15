@@ -26,7 +26,7 @@
             <div class="input-group">
               <input type="text" class="form-control" id="url" aria-describedby="basic-addon3 basic-addon4">
               <div class="input-group-append">
-                <button class="btn btn-primary" type="submit" id="vanity_url">Submit</button>
+                <button class="btn btn-primary" type="submit" id="verify_url">Submit</button>
               </div>
             </div>
           </div>
@@ -39,7 +39,7 @@
       // 在页面加载完成后执行 JavaScript 代码
       document.addEventListener('DOMContentLoaded', function() {
         // 获取按钮元素
-        var button = document.getElementById('vanity_url');
+        var button = document.getElementById('verify_url');
         // 获取输入框元素
         var input = document.getElementById('url');
         
@@ -60,7 +60,7 @@
             alert('请输入正确的 YouTube 视频 URL！');
           } else {
             // 构建包含 URL 参数的 GET 请求
-            var getRequestUrl = '/vanity_url?q=' + encodeURIComponent(inputValue);
+            var getRequestUrl = '/verify_url?q=' + encodeURIComponent(inputValue);
             
             // 发送 GET 请求
             fetch(getRequestUrl)
